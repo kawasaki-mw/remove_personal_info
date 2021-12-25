@@ -13,7 +13,9 @@ if uploaded_file is not None:
     pdf.save('tmp.pdf')
 
     with open("tmp.pdf", "rb") as pdf_file:
-        encoded_string = base64.b64encode(pdf_file.read())
+        content = pdf_file.read()
+        encoded_string = base64.b64encode(content)
+        encoded_string = encoded_string.decode()
         href = f'<a href="data:application/pdf;base64,{encoded_string}" download="result.pdf">download</a>'
         #href = f'<a download="result.pdf" href="data:application/pdf;base64,{encoded_string}">download</a>'
         st.markdown(f"ダウンロードする {href}", unsafe_allow_html=True)

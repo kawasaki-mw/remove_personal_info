@@ -7,7 +7,8 @@ from docx import Document
 
 
 st.title('著者情報削除')
-uploaded_file = st.file_uploader('ファイル（docxもしくはpdf）をアップロートしてください…', type=['docx', 'pdf'])
+st.markdown(f"ファイル（docxもしくはpdf）をアップロートしてください。<br>処理終了後、ダウンロードリンクが表示されます。", unsafe_allow_html=True)
+uploaded_file = st.file_uploader('下欄にドラッグ＆ドロップできます。', type=['docx', 'pdf'])
 
 if uploaded_file is not None:
 

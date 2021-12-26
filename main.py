@@ -23,7 +23,7 @@ if uploaded_file is not None:
             for meta_field in meta_fields:
                 setattr(core_properties, meta_field, "")
 
-            download_filename = uploaded_file.name#'result.docx'
+            download_filename = uploaded_file.name
             output_filename = hashlib.sha224(uploaded_file.name.encode()).hexdigest()#'tmp.docx'
             doc.save(output_filename)
             with open(output_filename, mode="rb") as f:
@@ -38,10 +38,10 @@ if uploaded_file is not None:
 
         elif ext == '.pdf':
             pdf = pikepdf.open(uploaded_file)
-            pdf.docinfo["/Title"] = ""
-            pdf.docinfo["/Author"] = ""
+            del(pdf.docinfo)
+            del(pdf.Root.Metadata)
             
-            download_filename = uploaded_file.name#'result.pdf'
+            download_filename = uploaded_file.name
             output_filename = hashlib.sha224(uploaded_file.name.encode()).hexdigest()#'tmp.pdf'
             pdf.save(output_filename)
 

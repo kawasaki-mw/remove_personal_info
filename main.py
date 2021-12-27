@@ -38,9 +38,15 @@ if uploaded_file is not None:
 
         elif ext == '.pdf':
             pdf = pikepdf.open(uploaded_file)
-            del(pdf.docinfo)
-            del(pdf.Root.Metadata)
-            
+            try:
+                del(pdf.docinfo)
+            except:
+                pass
+            try:
+                del(pdf.Root.Metadata)
+            except:
+                pass
+
             download_filename = uploaded_file.name
             output_filename = hashlib.sha224(uploaded_file.name.encode()).hexdigest()#'tmp.pdf'
             pdf.save(output_filename)

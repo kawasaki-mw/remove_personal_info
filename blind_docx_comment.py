@@ -18,8 +18,8 @@ uploaded_file = st.file_uploader('下欄にドラッグ＆ドロップできま�
 if uploaded_file is not None:
 
     try:
-        #doc = Document(uploaded_file)
-        #doc.save(uploaded_file.name)
+        doc = Document(uploaded_file)
+        doc.save(uploaded_file.name)
 
         output_filename = hashlib.sha224(uploaded_file.name.encode()).hexdigest()
         
@@ -27,8 +27,8 @@ if uploaded_file is not None:
         srcfile = uploaded_file.name  # docx file
         dstfile = output_filename
 
-        st.markdown(f"{srcfile}", unsafe_allow_html=True)
-        st.markdown(f"{dstfile}", unsafe_allow_html=True)
+        #st.markdown(f"{srcfile}", unsafe_allow_html=True)
+        #st.markdown(f"{dstfile}", unsafe_allow_html=True)
 
         with zipfile.ZipFile(srcfile) as inzip, zipfile.ZipFile(dstfile, "w") as outzip:
             pass
@@ -48,8 +48,10 @@ if uploaded_file is not None:
                     else: # Other file, dont want to modify => just copy it
 
                         outzip.writestr(inzipinfo.filename, infile.read())
-
-        os.remove(uploaded_file)
+        try:
+            os.remove(uploaded_file.name)
+        except:
+            pass
 
         download_filename = uploaded_file.name
         with open(output_filename, mode="rb") as f:
@@ -59,8 +61,10 @@ if uploaded_file is not None:
             href = f'<a href="data:application/docx;base64,{encoded_string}" download="{download_filename}">download</a>'
             st.markdown(f"ダウンロードする {href}", unsafe_allow_html=True)
 
-        os.remove(output_filename)
-        
+        try:
+            os.remove(output_filename)
+        except:
+            pass
 
     except Exception as e:
         st.markdown(f"<b>エラーが発生しました: {str(e)}</b>", unsafe_allow_html=True)

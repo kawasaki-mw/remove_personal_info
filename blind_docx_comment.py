@@ -12,7 +12,7 @@ from zipfile import ZipFile
 def docx_blind_comment(input_file, output_file):
 
     # generate a temp file
-    tmpfd, tmpname = tempfile.mkstemp(dir=os.path.dirname(input_file))
+    tmpfd, tmpname = tempfile.mkstemp(dir=os.path.dirname(input_file.filename))
     os.close(tmpfd)
 
     # filename

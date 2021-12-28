@@ -1,66 +1,47 @@
-import streamlit as st
-import re
 import os
-import base64
+import re
+import io
+import zipfile
+import tempfile
 import hashlib
+import base64
 from zipfile import ZipFile
 
-def docx_blind_comment(input_file, output_file):
 
-    docx_file_name = input_file
+def doc_blind_comment(input_file, output_file):
 
-    files = dict()
+    # generate a temp file
+    tmpfd, tmpname = tempfile.mkstemp(dir=os.path.dirname(input_file))
+    os.close(tmpfd)
 
-    # We read all of the files and store them in "files" dictionary.
-    document_as_zip = ZipFile(docx_file_name, 'r')
-    for internal_file in document_as_zip.infolist():
-        file_reader = document_as_zip.open(internal_file.filename, "r")
-        files[internal_file.filename] = file_reader.readlines()
-        file_reader.close()
-       
-    # We don't need to read anything more, so we close the file.
-    document_as_zip.close() 
+    # filename
+    srcfile = input_file  # docx file
+    dstfile = tmpname
 
-    # If there are any comments.
-    if "word/comments.xml" in files.keys():
-        # We will be working on comments file...
-        comments = files["word/comments.xml"]
+    with zipfile.ZipFile(srcfile) as inzip, zipfile.ZipFile(dstfile, "w") as outzip:
+        # Iterate the input files
+        for inzipinfo in inzip.infolist():
+            # Read input file
+            with inzip.open(inzipinfo) as infile:
 
-        comments_new = str()
+                if inzipinfo.filename.startswith("word/comments.xml"):
 
-        # Files contents have been read as list of byte strings.
-        for comment in comments:
-            if isinstance(comment, bytes):
-                # Change every author to "Unknown Author".
-                comments_new += re.sub(r'w:author="[^"]*"', "w:author=\"Unknown Author\"", comment.decode())
+                    comments = infile.read()
+                    comments_new = str()
+                    comments_new += re.sub(r'w:author="[^"]*"', "w:author=\"Anonymous Author\"", comments.decode())
+                    outzip.writestr(inzipinfo.filename, comments_new)
 
-        files["word/comments.xml"] = comments_new
-        
-        
-    docx_outputfile_name = output_file
+                else: # Other file, dont want to modify => just copy it
 
-    # Now we want to save old files to the new archive.
-    document_as_zip = ZipFile(docx_outputfile_name, 'w')
-    for internal_file_name in files.keys():
-        # Those are lists of byte strings, so we merge them...
-        merged_binary_data = str()
-        for binary_data in files[internal_file_name]:
-            # If the file was not edited (therefore is not the comments.xml file).
-            try:
-                if not isinstance(binary_data, str):
-                    binary_data = binary_data.decode()
-                # Merge file contents.
-                merged_binary_data += binary_data
-            except:
-                #print(internal_file_name)
-                pass
+                    outzip.writestr(inzipinfo.filename, infile.read())
 
-        # We write old file contents to new file in new .docx.
-        document_as_zip.writestr(internal_file_name, merged_binary_data)
 
-    # Close file for writing.
-    document_as_zip.close()
-
+    # replace with the temp archive
+    if os.path.exists(output_file):
+        os.remove(output_file)
+    os.rename(tmpname, output_file)
+    if os.path.exists(tmpname):
+        os.remove(tmpname)
 
 
 

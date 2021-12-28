@@ -19,6 +19,11 @@ if uploaded_file is not None:
 
     try:
         doc = Document(uploaded_file)
+
+        core_properties = doc.core_properties
+        meta_fields= ["author", "category", "last_modified_by", "comments", "content_status", "identifier", "keywords", "language", "subject", "title", "version"]
+        for meta_field in meta_fields:
+            setattr(core_properties, meta_field, "")
         doc.save(uploaded_file.name)
 
         output_filename = hashlib.sha224(uploaded_file.name.encode()).hexdigest()
@@ -31,7 +36,6 @@ if uploaded_file is not None:
         #st.markdown(f"{dstfile}", unsafe_allow_html=True)
 
         with zipfile.ZipFile(srcfile) as inzip, zipfile.ZipFile(dstfile, "w") as outzip:
-            pass
             # Iterate the input files
             for inzipinfo in inzip.infolist():
                 

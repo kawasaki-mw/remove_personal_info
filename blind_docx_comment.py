@@ -12,7 +12,7 @@ from zipfile import ZipFile
 def docx_blind_comment(input_file, output_file):
 
     # generate a temp file
-    tmpfd, tmpname = tempfile.mkstemp(dir=os.path.dirname(input_file.filename))
+    tmpfd, tmpname = tempfile.mkstemp(dir=os.path.dirname(input_file))
     os.close(tmpfd)
 
     # filename
@@ -56,7 +56,7 @@ if uploaded_file is not None:
     try:
 
         output_filename = hashlib.sha224(uploaded_file.name.encode()).hexdigest()#'tmp.docx'
-        docx_blind_comment(uploaded_file, output_filename)
+        docx_blind_comment(uploaded_file.name, output_filename)
 
         download_filename = uploaded_file.name
         with open(output_filename, mode="rb") as f:
